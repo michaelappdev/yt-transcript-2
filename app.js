@@ -1,22 +1,25 @@
 const express = require('express');
 const app = express();
-const YouTubeTranscript = require('youtube-transcript');
+const ytdl = require('youtube-transcript-api');
 
 app.use(express.json());
 
 app.post('/transcript', async (req, res) => {
-    console.log('Request body:', req.body);  // Add this line for debugging
-    const { videoId } = req.body;
+  const { videoId } = req.body;
 
   if (!videoId) {
     return res.status(400).json({ error: 'Video ID is required' });
   }
 
   try {
-    const transcript = await YouTubeTranscript.fetchTranscript(videoId);
-    res.json(transcript);
+    const transcript = await ytdl.getTranscript(videoId);
+
+    // Concatenate the text segments into a single string
+    const fullTranscript = transcript.map(segment => segment.text).join(' ');
+
+    res.json({ transcript: fullTranscript });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching transcript:', error);
     res.status(500).json({ error: 'Failed to fetch transcript' });
   }
 });
