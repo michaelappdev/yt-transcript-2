@@ -5,7 +5,8 @@ const YouTubeTranscript = require('youtube-transcript');
 app.use(express.json());
 
 app.post('/transcript', async (req, res) => {
-  const { videoId } = req.body;
+    console.log('Request body:', req.body);  // Add this line for debugging
+    const { videoId } = req.body;
 
   if (!videoId) {
     return res.status(400).json({ error: 'Video ID is required' });
