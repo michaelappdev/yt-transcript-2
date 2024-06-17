@@ -4,6 +4,12 @@ const ytdl = require('youtube-transcript-api');
 
 app.use(express.json());
 
+const extractVideoId = (urlOrId) => {
+  const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&\s]+)/;
+  const match = urlOrId.match(urlPattern);
+  return match ? match[1] : urlOrId;
+};
+
 app.post('/transcript', async (req, res) => {
   const { videoId } = req.body;
 
@@ -11,8 +17,10 @@ app.post('/transcript', async (req, res) => {
     return res.status(400).json({ error: 'Video ID is required' });
   }
 
+  const extractedVideoId = extractVideoId(videoId);
+
   try {
-    const transcript = await ytdl.getTranscript(videoId);
+    const transcript = await ytdl.getTranscript(extractedVideoId);
 
     // Concatenate the text segments into a single string
     const fullTranscript = transcript.map(segment => segment.text).join(' ');
